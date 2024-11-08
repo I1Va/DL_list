@@ -92,7 +92,7 @@ DL_list_elem_value_t *DL_list_back(DL_list_t *list) {
 }
 
 DL_list_elem_value_t *DL_list_next_elem(DL_list_t *list, const int addr) {
-    if (addr >= list->size || addr < 0) {
+    if (addr >= (int) list->size || addr < 0) {
         return NULL;
     }
     DL_list_node_t *next_node = &list->data[list->data[addr].next];
@@ -103,7 +103,7 @@ DL_list_elem_value_t *DL_list_next_elem(DL_list_t *list, const int addr) {
 }
 
 DL_list_elem_value_t *DL_list_prev_elem(DL_list_t *list, const int addr) {
-    if (addr >= list->size || addr < 0) {
+    if (addr >= (int) list->size || addr < 0) {
         return NULL;
     }
     DL_list_node_t *prev_node = &list->data[list->data[addr].prev];

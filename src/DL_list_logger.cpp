@@ -191,11 +191,11 @@ bool DL_list_generate_graph_img(DL_list_t *list, char short_img_path[]) {
     // MAKING GRAPH
 
     graphviz_start_graph(graphviz_code_file);
-    for (int i = 0; i < list->size; i++) {
+    for (size_t i = 0; i < list->size; i++) {
         graphviz_make_node(graphviz_code_file, list->data[i]);
     }
-    for (int i = 1; i < list->size; i++) {
-        graphviz_make_heavy_unvisible_edge(graphviz_code_file, i - 1, i);
+    for (size_t i = 1; i < list->size; i++) {
+        graphviz_make_heavy_unvisible_edge(graphviz_code_file, (int) i - 1, (int) i);
     }
 
     // list->data[0].next = 0;
@@ -209,12 +209,12 @@ bool DL_list_generate_graph_img(DL_list_t *list, char short_img_path[]) {
     // list->data[7].prev = 4;
     // list->data[5].next = 7;
 
-    for (int i = 0; i < list->size; i++) {
+    for (size_t i = 0; i < list->size; i++) {
         if (list->data[i].next != -1) {
-            graphviz_make_edge(graphviz_code_file, i, list->data[i].next, "green", 2);
+            graphviz_make_edge(graphviz_code_file, (int) i, list->data[i].next, "green", 2);
         }
         if (list->data[i].prev != -1) {
-            graphviz_make_edge(graphviz_code_file, list->data[i].prev, i, "blue", 1);
+            graphviz_make_edge(graphviz_code_file, list->data[i].prev, (int) i, "blue", 1);
         }
     }
 

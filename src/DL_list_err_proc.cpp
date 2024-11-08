@@ -41,7 +41,7 @@ DL_list_err_t DL_list_verify(const DL_list_t list) {
         DL_list_node_t node = list.data[i];
         if (node.addr >= (int) list.size || node.addr < 0 || (int) i != node.addr) {
             DL_list_add_err(&errors, DL_ERR_INVALID_NODE);
-            DEBUG_DL_LIST_ERROR(DL_ERR_INVALID_NODE, "node[%d] has invalid addr: {%d}", i, node.addr)
+            DEBUG_DL_LIST_ERROR(DL_ERR_INVALID_NODE, "node[%lu] has invalid addr: {%d}", i, node.addr)
         }
         if (node.empty) {
             continue;
