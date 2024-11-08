@@ -63,11 +63,11 @@ void graphviz_start_graph(FILE *graphviz_code_file);
 
 void graphviz_end_graph(FILE *graphviz_code_file);
 
-void graphviz_make_node(FILE *graphviz_code_file, DL_list_node_t node);
+void graphviz_make_node(FILE *graphviz_code_file, DL_list_node_t *node);
 
 void graphviz_make_heavy_unvisible_edge(FILE *graphviz_code_file, int node_idx1, int node_idx2);
 
-void graphviz_make_edge(FILE *graphviz_code_file, int node_idx1, int node_idx2, const char color[], int penwidth);
+void graphviz_make_edge(FILE *graphviz_code_file, DL_list_node_t *node1, DL_list_node_t *node2, const char color[], int penwidth);
 
 void DL_list_log_html_insert_image(FILE *log_output_file_ptr, char short_img_path[], int width_percent);
 

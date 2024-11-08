@@ -39,41 +39,37 @@ DL_list_err_t DL_list_verify(const DL_list_t list) {
 
     for (size_t i = 0; i < list.size; i++) {
         DL_list_node_t node = list.data[i];
-        if (node.addr >= (int) list.size || node.addr < 0 || (int) i != node.addr) {
-            DL_list_add_err(&errors, DL_ERR_INVALID_NODE);
-            DEBUG_DL_LIST_ERROR(DL_ERR_INVALID_NODE, "node[%lu] has invalid addr: {%d}", i, node.addr)
-        }
         if (node.empty) {
             continue;
         }
-        if (list.data[node.prev].next != node.addr) {
+        if (node.prev->next != &node) {
             DL_list_add_err(&errors, DL_ERR_INVALID_NODE_CONNECTION);
-            DEBUG_DL_LIST_ERROR(DL_ERR_INVALID_NODE, "nodes '%d' and '%d' connection invalid", node.prev, node.addr);
+            DEBUG_DL_LIST_ERROR(DL_ERR_INVALID_NODE, "nodes '%p' and '%p' connection invalid", node.prev, &node);
         }
-        if (list.data[node.next].prev != node.addr) {
+        if (node.next->prev != &node) {
             DL_list_add_err(&errors, DL_ERR_INVALID_NODE_CONNECTION);
-            DEBUG_DL_LIST_ERROR(DL_ERR_INVALID_NODE, "nodes '%d' and '%d' connection invalid", node.next, node.addr);
+            DEBUG_DL_LIST_ERROR(DL_ERR_INVALID_NODE, "nodes '%p' and '%p' connection invalid", node.next, &node);
         }
     }
 
-    DL_list_node_t node = list.data[0];
-    node = list.data[node.next];
+    DL_list_node_t *node = &list.data[0];
+    node = node->next;
 
     size_t iterations = 0;
 
-    while (node.addr != 0) {
+    while (node != &list.data[0]) {
         if (iterations >= MAX_CYCLE_ITERATIONS) {
             DL_list_add_err(&errors, DL_ERR_CYCLED);
             DEBUG_DL_LIST_ERROR(DL_ERR_CYCLED, "")
             break;
         }
-        if (node.next == -1) {
+        if (node->next == NULL) {
             DL_list_add_err(&errors, DL_ERR_INVALID_NODE);
             DEBUG_DL_LIST_ERROR(DL_ERR_INVALID_NODE,
-                "reachable node has invalid parameters: addr: {%d}, next: {%d} prev: {%d}", node.addr, node.next, node.prev)
+                "reachable node has invalid parameters: addr: {%p}, next: {%p} prev: {%p}", node, node->next, node->prev)
             break;
         }
-        node = list.data[node.next];
+        node = node->next;
         iterations++;
     }
 

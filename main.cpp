@@ -26,12 +26,12 @@ int main() {
         DL_list_push_back(&list, rand() % 128);
     }
 
-    DL_list_pop(&list, 4);
-    DL_list_insert_back(&list, 3, 2006);
+    DL_list_pop(&list, &list.data[4]);
+    DL_list_insert_back(&list, &list.data[3], 2006);
 
-    DL_list_insert_front(&list, 4, 7500);
+    DL_list_insert_front(&list, &list.data[4], 7500);
 
-    DL_list_insert_back(&list, 6, 228);
+    DL_list_insert_back(&list, &list.data[6], 228);
 
     DEBUG_DL_LIST_ERROR(DL_list_verify(list), "")
     ListLogDump(&list, &log_obj); // FIXME: можно передавать указатель на logfile и не хранить в list

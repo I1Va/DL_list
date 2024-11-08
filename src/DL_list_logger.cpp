@@ -163,15 +163,15 @@ void graphviz_end_graph(FILE *graphviz_code_file) {
     fclose(graphviz_code_file);
 }
 
-void graphviz_make_node(FILE *graphviz_code_file, DL_list_node_t node) {
-    fprintf(graphviz_code_file, "   NODE%d[pin=true,shape=\"box\",label=\"addr: %d\nval: %d\nprev: %d\nnext: %d\"];\n", node.addr, node.addr, node.value, node.prev, node.next);
+void graphviz_make_node(FILE *graphviz_code_file, DL_list_node_t *node) {
+    fprintf(graphviz_code_file, "   NODE%p[pin=true,shape=\"box\",label=\"addr: %p\nval: %d\nprev: %p\nnext: %p\"];\n", node, node, node->value, node->prev, node->next);
 }
 
 void graphviz_make_heavy_unvisible_edge(FILE *graphviz_code_file, int node_idx1, int node_idx2) {
     fprintf(graphviz_code_file, "   NODE%d -> NODE%d [weight=%d,color=\"white\"];\n", node_idx1, node_idx2, EDGE_MAX_WEIGHT);
 }
-void graphviz_make_edge(FILE *graphviz_code_file, int node_idx1, int node_idx2, const char color[] = "black", int penwidth=SIMP_EDGE_WIDTH) {
-    fprintf(graphviz_code_file, "   NODE%d -> NODE%d [color=\"%s\",penwidth=%d];\n", node_idx1, node_idx2, color, penwidth);
+void graphviz_make_edge(FILE *graphviz_code_file, DL_list_node_t *node1, DL_list_node_t *node2, const char color[] = "black", int penwidth=SIMP_EDGE_WIDTH) {
+    fprintf(graphviz_code_file, "   NODE%p -> NODE%p [color=\"%s\",penwidth=%d];\n", node1, node2, color, penwidth);
 }
 
 void DL_list_log_html_insert_image(FILE *log_output_file_ptr, char short_img_path[], int width_percent) {
@@ -202,7 +202,7 @@ bool DL_list_generate_graph_img(DL_list_t *list, log_t *log_obj, char short_img_
 
     graphviz_start_graph(graphviz_code_file);
     for (size_t i = 0; i < list->size; i++) {
-        graphviz_make_node(graphviz_code_file, list->data[i]);
+        graphviz_make_node(graphviz_code_file, &list->data[i]);
     }
     for (size_t i = 1; i < list->size; i++) {
         graphviz_make_heavy_unvisible_edge(graphviz_code_file, (int) i - 1, (int) i);
@@ -220,11 +220,11 @@ bool DL_list_generate_graph_img(DL_list_t *list, log_t *log_obj, char short_img_
     // list->data[5].next = 7;
 
     for (size_t i = 0; i < list->size; i++) {
-        if (list->data[i].next != -1) {
-            graphviz_make_edge(graphviz_code_file, (int) i, list->data[i].next, "green", 2);
+        if (list->data[i].next != NULL) {
+            graphviz_make_edge(graphviz_code_file, &list->data[i], list->data[i].next, "green", 2);
         }
-        if (list->data[i].prev != -1) {
-            graphviz_make_edge(graphviz_code_file, list->data[i].prev, (int) i, "blue", 1);
+        if (list->data[i].prev != NULL) {
+            graphviz_make_edge(graphviz_code_file, list->data[i].prev, &list->data[i], "blue", 1);
         }
     }
 
@@ -266,8 +266,8 @@ void DL_list_log_dump(DL_list_t *list, log_t *log_obj, const char file_name[], c
     DL_list_print_log_func_info(log_obj->log_file_ptr, file_name, func_name, line_idx);
 
     fprintf_html_red(log_obj->log_file_ptr, "list [%p] at %s:%d\n", list, file_name, line_idx);
-    fprintf_html_grn(log_obj->log_file_ptr, "size     : [%5lu]\n", list->size);
-    fprintf_html_grn(log_obj->log_file_ptr, "free_addr: [%5d]\n", list->free_addr);
+    fprintf_html_grn(log_obj->log_file_ptr, "size: [%lu]\n", list->size);
+    fprintf_html_grn(log_obj->log_file_ptr, "free_addr: [%p]\n", list->free_node);
 
     char short_img_path[MAX_LOG_FILE_PATH_SZ] = {};
     DL_list_generate_graph_img(list, log_obj, short_img_path);

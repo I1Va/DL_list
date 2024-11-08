@@ -7,10 +7,8 @@
 typedef int DL_list_elem_value_t;
 
 struct DL_list_node_t {
-    int next;
-    int prev;
-
-    int addr;
+    DL_list_node_t *next;
+    DL_list_node_t *prev;
 
     DL_list_elem_value_t value;
     bool empty;
@@ -38,10 +36,8 @@ const size_t MAX_SYSTEM_COMMAND_SIZE = MAX_GRAPHVIZ_CODES_DIR_SZ + MAX_IMG_DIR_S
 
 struct DL_list_t {
     size_t size;
-
+    DL_list_node_t *free_node;
     DL_list_node_t *data;
-
-    int free_addr;
 };
 
 
@@ -55,23 +51,23 @@ DL_list_elem_value_t *DL_list_next_elem(DL_list_t *list, const int addr);
 
 DL_list_elem_value_t *DL_list_prev_elem(DL_list_t *list, const int addr);
 
-int DL_list_push_back(DL_list_t *list, const DL_list_elem_value_t value);
+DL_list_node_t *DL_list_push_back(DL_list_t *list, const DL_list_elem_value_t value);
 
-int DL_list_push_front(DL_list_t *list, const DL_list_elem_value_t value);
+DL_list_node_t *DL_list_push_front(DL_list_t *list, const DL_list_elem_value_t value);
 
-int DL_list_insert_back(DL_list_t *list, const int addr, const DL_list_elem_value_t value);
+DL_list_node_t *DL_list_insert_back(DL_list_t *list, DL_list_node_t *ptr, const DL_list_elem_value_t value);
 
-int DL_list_insert_front(DL_list_t *list, const int addr, const DL_list_elem_value_t value);
+DL_list_node_t *DL_list_insert_front(DL_list_t *list, DL_list_node_t *ptr, const DL_list_elem_value_t value);
 
-int DL_list_get_free_cell_addr(DL_list_t *list);
+DL_list_node_t *DL_list_get_free_cell_addr(DL_list_t *list);
 
 bool DL_list_ctor(DL_list_t *list, const size_t size);
 
 void DL_list_dtor(DL_list_t *list);
 
-bool DL_list_pop(DL_list_t *list, const int addr);
+bool DL_list_pop(DL_list_t *list, DL_list_node_t *ptr);
 
-int DL_list_find(DL_list_t *list, const DL_list_elem_value_t value);
+DL_list_node_t *DL_list_find(DL_list_t *list, const DL_list_elem_value_t value);
 
 void DL_list_clear(DL_list_t *list);
 
