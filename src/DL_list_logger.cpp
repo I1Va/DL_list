@@ -12,12 +12,22 @@
 #include "DL_list_proc.h"
 #include "general.h"
 
-// ON_DEBUG
-// (
+bool logs_ctor(log_t *log_obj, const char log_dir[], const char log_file[]) {
+    *log_obj = {};
+    memcpy(log_obj->log_file, log_file, MAX_LOG_FILE_PATH_SZ);
+    memcpy(log_obj->log_dir, log_dir, MAX_LOG_DIR_SZ);
 
+    create_logs_dir(log_obj->log_dir);
+    FILE *log_file_ptr = fopen(log_file, "a");
+    if (log_file_ptr == NULL) {
+        debug("can't open '%s'", log_file);
+        return false;
+    }
+    log_obj->log_file_ptr = log_file_ptr;
 
-void DL_list_log_file_start(FILE *stream) {
-    fprintf(stream, "<pre>\n");
+    fprintf(log_file_ptr, "<pre>\n");
+
+    return true;
 }
 
 void DL_list_fprintf_border(FILE* stream, const char bord_char, const size_t bord_sz, bool new_line) {
@@ -110,8 +120,8 @@ int get_dir_files_count(const char dir_path[]) {
     return file_count;
 }
 
-log_dir_t DL_list_make_graphviz_dirs(char log_file_path[]) {
-    log_dir_t logs_dir_obj = {};
+graphviz_dir_t DL_list_make_graphviz_dirs(char log_file_path[]) {
+    graphviz_dir_t logs_dir_obj = {};
 
     char *log_file_path_ptr = (char *) log_file_path;
     char *log_dir_ptr = strrchr(log_file_path_ptr, '/');
@@ -170,8 +180,8 @@ void DL_list_log_html_insert_image(FILE *log_output_file_ptr, char short_img_pat
     fprintf(log_output_file_ptr, "<img src=\"%s\" width=\"%d%%\">\n", short_img_path, width_percent);
 }
 
-bool DL_list_generate_graph_img(DL_list_t *list, char short_img_path[]) {
-    log_dir_t log_dir_obj = DL_list_make_graphviz_dirs(list->log_file_path);
+bool DL_list_generate_graph_img(DL_list_t *list, log_t *log_obj, char short_img_path[]) {
+    graphviz_dir_t log_dir_obj = DL_list_make_graphviz_dirs(log_obj->log_file);
 
     int graph_num = get_dir_files_count(log_dir_obj.graphviz_codes_dir);
 
@@ -241,32 +251,30 @@ bool create_logs_dir(const char log_dir[]) {
     return true;
 }
 
-void DL_list_log_dump(DL_list_t *list, const char file_name[], const char func_name[], const int line_idx) {
+void DL_list_log_dump(DL_list_t *list, log_t *log_obj, const char file_name[], const char func_name[], const int line_idx) {
     if (list == NULL) {
         return;
     }
 
-    if (list->log_file_ptr == NULL) {
+    if (log_obj->log_file_ptr == NULL) {
         return;
     }
 
-    DL_list_fprintf_title(list->log_file_ptr, "DL_LIST DUMP", '-', BORDER_SZ);
-    DL_list_print_log_type(list->log_file_ptr, DL_LOG_DEBUG);
-    DL_list_log_print_time(list->log_file_ptr);
-    DL_list_print_log_func_info(list->log_file_ptr, file_name, func_name, line_idx);
+    DL_list_fprintf_title(log_obj->log_file_ptr, "DL_LIST DUMP", '-', BORDER_SZ);
+    DL_list_print_log_type(log_obj->log_file_ptr, DL_LOG_DEBUG);
+    DL_list_log_print_time(log_obj->log_file_ptr);
+    DL_list_print_log_func_info(log_obj->log_file_ptr, file_name, func_name, line_idx);
 
-    fprintf_html_red(list->log_file_ptr, "list [%p] at %s:%d\n", list, file_name, line_idx);
-    fprintf_html_grn(list->log_file_ptr, "size     : [%5lu]\n", list->size);
-    fprintf_html_grn(list->log_file_ptr, "free_addr: [%5d]\n", list->free_addr);
+    fprintf_html_red(log_obj->log_file_ptr, "list [%p] at %s:%d\n", list, file_name, line_idx);
+    fprintf_html_grn(log_obj->log_file_ptr, "size     : [%5lu]\n", list->size);
+    fprintf_html_grn(log_obj->log_file_ptr, "free_addr: [%5d]\n", list->free_addr);
 
     char short_img_path[MAX_LOG_FILE_PATH_SZ] = {};
-    DL_list_generate_graph_img(list, short_img_path);
-    DL_list_log_html_insert_image(list->log_file_ptr, short_img_path, LOG_WIDTH_VAL);
+    DL_list_generate_graph_img(list, log_obj, short_img_path);
+    DL_list_log_html_insert_image(log_obj->log_file_ptr, short_img_path, LOG_WIDTH_VAL);
     // for (int i = 0; i < list.size; i++) {
     //     fprintf(list.log_output_file_ptr, list.data)
     // }
 
-    DL_list_fprintf_border(list->log_file_ptr, '-', BORDER_SZ, true);
+    DL_list_fprintf_border(log_obj->log_file_ptr, '-', BORDER_SZ, true);
 }
-
-// )

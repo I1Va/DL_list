@@ -7,7 +7,7 @@
 #include "DL_list_err_proc.h"
 #include "general.h"
 
-bool DL_list_ctor(DL_list_t *list, const size_t size, const char log_path[] = "") {
+bool DL_list_ctor(DL_list_t *list, const size_t size) {
 
     list->size = size + 2;
     list->data = (DL_list_node_t *) calloc((size_t) list->size, sizeof(DL_list_node_t));
@@ -34,16 +34,6 @@ bool DL_list_ctor(DL_list_t *list, const size_t size, const char log_path[] = ""
     for (size_t i = 1; i < list->size - 1; i++) {
         list->data[i].next = (int) i + 1; // creation of one linked free_nodes list
     }
-
-    strcpy(list->log_file_path, log_path);
-    list->log_file_ptr = fopen(log_path, "a");
-    if (list->log_file_ptr == NULL) {
-        DEBUG_DL_LIST_ERROR(DL_ERR_FILE_OPEN, "")
-        CLEAR_MEMORY(exit_mark);
-    }
-    setbuf(list->log_file_ptr, NULL); // disable buffering
-
-
     return true;
 
     exit_mark:
@@ -51,7 +41,6 @@ bool DL_list_ctor(DL_list_t *list, const size_t size, const char log_path[] = ""
     if (list->data != NULL) {
         FREE(list->data);
     }
-
     return false;
 }
 

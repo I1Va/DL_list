@@ -42,9 +42,6 @@ struct DL_list_t {
     DL_list_node_t *data;
 
     int free_addr;
-
-    FILE *log_file_ptr; // FIXME: можно не хранить тут
-    char log_file_path[MAX_LOG_FILE_PATH_SZ];
 };
 
 
@@ -68,7 +65,7 @@ int DL_list_insert_front(DL_list_t *list, const int addr, const DL_list_elem_val
 
 int DL_list_get_free_cell_addr(DL_list_t *list);
 
-bool DL_list_ctor(DL_list_t *list, const size_t size, const char log_path[]);
+bool DL_list_ctor(DL_list_t *list, const size_t size);
 
 void DL_list_dtor(DL_list_t *list);
 

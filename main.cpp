@@ -5,16 +5,22 @@
 #include <cstdio>
 #include <cstdlib>
 
-const char logs_dir[] = "./logs";
+const char LOGS_DIR[] = "./logs";
+const char LOG_FILE[] = "./logs/logfile.html";
 
 int main() {
-    create_logs_dir(logs_dir);
+
+    log_t log_obj = {};
+    if (!logs_ctor(&log_obj, LOGS_DIR, LOG_FILE)) {
+        debug("logs_ctor failed");
+        return EXIT_FAILURE;
+    }
 
     // DL_list_err_t last_err = DL_ERR_OK;
 
     DL_list_t list = {};
-    DL_list_ctor(&list, 10, "./logs/log.html");
-    DL_list_log_file_start(list.log_file_ptr);
+    DL_list_ctor(&list, 10);
+
 
     for (int i = 0; i < 7; i++) {
         DL_list_push_back(&list, rand() % 128);
@@ -28,7 +34,7 @@ int main() {
     DL_list_insert_back(&list, 6, 228);
 
     DEBUG_DL_LIST_ERROR(DL_list_verify(list), "")
-    ListLogDump(&list); // FIXME: можно передавать указатель на logfile и не хранить в list
+    ListLogDump(&list, &log_obj); // FIXME: можно передавать указатель на logfile и не хранить в list
 
     // DL_list_insert(&list, 4, 52, &last_err);
 
