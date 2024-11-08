@@ -1,0 +1,10 @@
+docs
+build
+debug
+*.out
+*.d
+*.exe
+*.html
+logs
+test.dot
+test.png
