@@ -13,6 +13,9 @@
 const int EDGE_MAX_WEIGHT = 1024;
 const int SIMP_EDGE_WIDTH = 2;
 
+const size_t BORDER_SZ = 100;
+const size_t LOG_WIDTH_VAL = 200;
+
 enum DL_list_log_type_t {
     DL_LOG_ANALYS = 0,
     DL_LOG_DEBUG = 1,
@@ -22,6 +25,7 @@ enum DL_list_log_type_t {
 struct log_t {
     char log_dir[MAX_LOG_DIR_SZ];
     char log_file[MAX_LOG_FILE_PATH_SZ];
+    bool short_log;
     FILE *log_file_ptr;
 };
 
@@ -32,8 +36,7 @@ struct graphviz_dir_t {
 };
 
 
-const size_t BORDER_SZ = 100;
-const size_t LOG_WIDTH_VAL = 75;
+
 
 bool create_logs_dir(const char log_dir[]);
 
@@ -65,7 +68,7 @@ void graphviz_end_graph(FILE *graphviz_code_file);
 
 void graphviz_make_node(FILE *graphviz_code_file, DL_list_node_t *node);
 
-void graphviz_make_heavy_unvisible_edge(FILE *graphviz_code_file, int node_idx1, int node_idx2);
+void graphviz_make_heavy_unvisible_edge(FILE *graphviz_code_file, DL_list_node_t *node1, DL_list_node_t *node2);
 
 void graphviz_make_edge(FILE *graphviz_code_file, DL_list_node_t *node1, DL_list_node_t *node2, const char color[], int penwidth);
 

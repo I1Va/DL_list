@@ -27,6 +27,7 @@ void DL_list_err_get_descr(const enum DL_list_err_t err_code, char err_descr_str
     DESCR_(err_code, DL_ERR_INVALID_NODE_CONNECTION);
     DESCR_(err_code, DL_ERR_STACK);
     DESCR_(err_code, DL_ERR_SYSTEM);
+    DESCR_(err_code, DL_ERR_REALLOC);
 
     if (!error) {
         sprintf(err_descr_str, "ALL IS OK:)");
@@ -34,30 +35,30 @@ void DL_list_err_get_descr(const enum DL_list_err_t err_code, char err_descr_str
     #undef DESCR_
 }
 
-DL_list_err_t DL_list_verify(const DL_list_t list) {
+DL_list_err_t DL_list_verify(const DL_list_t *list) {
     DL_list_err_t errors = DL_ERR_OK;
 
-    for (size_t i = 0; i < list.size; i++) {
-        DL_list_node_t node = list.data[i];
-        if (node.empty) {
+    for (size_t i = 0; i < list->size; i++) {
+        DL_list_node_t *node = &list->data[i];
+        if (node->empty) {
             continue;
         }
-        if (node.prev->next != &node) {
+        if (node->prev->next != node) {
             DL_list_add_err(&errors, DL_ERR_INVALID_NODE_CONNECTION);
-            DEBUG_DL_LIST_ERROR(DL_ERR_INVALID_NODE, "nodes '%p' and '%p' connection invalid", node.prev, &node);
+            DEBUG_DL_LIST_ERROR(DL_ERR_INVALID_NODE, "nodes '%p' and '%p' connection invalid", node->prev, &node);
         }
-        if (node.next->prev != &node) {
+        if (node->next->prev != node) {
             DL_list_add_err(&errors, DL_ERR_INVALID_NODE_CONNECTION);
-            DEBUG_DL_LIST_ERROR(DL_ERR_INVALID_NODE, "nodes '%p' and '%p' connection invalid", node.next, &node);
+            DEBUG_DL_LIST_ERROR(DL_ERR_INVALID_NODE, "nodes '%p' and '%p' connection invalid", node->next, &node);
         }
     }
 
-    DL_list_node_t *node = &list.data[0];
+    DL_list_node_t *node = &list->data[0];
     node = node->next;
 
     size_t iterations = 0;
 
-    while (node != &list.data[0]) {
+    while (node != &list->data[0]) {
         if (iterations >= MAX_CYCLE_ITERATIONS) {
             DL_list_add_err(&errors, DL_ERR_CYCLED);
             DEBUG_DL_LIST_ERROR(DL_ERR_CYCLED, "")

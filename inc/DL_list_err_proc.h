@@ -19,6 +19,7 @@ enum DL_list_err_t {
     DL_ERR_STACK                    = 1ull << 7,
     DL_ERR_POP                      = 1ull << 8,
     DL_ERR_SYSTEM                   = 1ull << 9,
+    DL_ERR_REALLOC                  = 1ull << 10,
 
 };
 
@@ -28,7 +29,7 @@ void DL_list_err_get_descr(enum DL_list_err_t err_code, char err_descr_str[]);
 
 void DL_list_add_err(enum DL_list_err_t *dest, enum DL_list_err_t add);
 
-DL_list_err_t DL_list_verify(const DL_list_t list);
+DL_list_err_t DL_list_verify(const DL_list_t *list);
 
 #ifdef _DEBUG
     #define DEBUG_DL_LIST_ERROR(err_code, str_, ...) {                                                      \

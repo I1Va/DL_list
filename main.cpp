@@ -15,25 +15,29 @@ int main() {
         debug("logs_ctor failed");
         return EXIT_FAILURE;
     }
+    log_obj.short_log = true;
 
     // DL_list_err_t last_err = DL_ERR_OK;
 
     DL_list_t list = {};
-    DL_list_ctor(&list, 10);
+    DL_list_ctor(&list, 0);
 
+    ListLogDump(&list, &log_obj); // FIXME: можно передавать указатель на logfile и не хранить в list
+    resize_up(&list);
+    // for (int i = 0; i < 4; i++) {
+    //     int val = rand() % 128;
+    //     printf("val[%d] : %d\n", i, val);
+    //     DL_list_push_back(&list, val);
+    // }
 
-    for (int i = 0; i < 7; i++) {
-        DL_list_push_back(&list, rand() % 128);
-    }
+    // DL_list_pop(&list, &list.data[4]);
+    // DL_list_insert_back(&list, &list.data[3], 2006);
 
-    DL_list_pop(&list, &list.data[4]);
-    DL_list_insert_back(&list, &list.data[3], 2006);
+    // DL_list_insert_front(&list, &list.data[4], 7500);
 
-    DL_list_insert_front(&list, &list.data[4], 7500);
+    // DL_list_insert_back(&list, &list.data[6], 228);
+    // DEBUG_DL_LIST_ERROR(DL_list_verify(&list), "")
 
-    DL_list_insert_back(&list, &list.data[6], 228);
-
-    DEBUG_DL_LIST_ERROR(DL_list_verify(list), "")
     ListLogDump(&list, &log_obj); // FIXME: можно передавать указатель на logfile и не хранить в list
 
     // DL_list_insert(&list, 4, 52, &last_err);
