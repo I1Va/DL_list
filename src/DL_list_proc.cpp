@@ -43,7 +43,9 @@ bool DL_list_ctor(DL_list_t *list, const size_t size) {
         list->data[i].next = NULL;
         list->data[i].prev = NULL;
 
-        list->data[i].idx = 0;
+        list->data[i].idx = (int) i;
+        list->data[i].next_idx = -1;
+        list->data[i].prev_idx = -1;
         fill_neighboring_idx(&list->data[i]);
 
         list->data[i].value = DL_LIST_POISON_VALUE;
@@ -52,6 +54,7 @@ bool DL_list_ctor(DL_list_t *list, const size_t size) {
     list->free_node = &list->data[1];
     for (size_t i = 1; i < list->size - 1; i++) {
         list->data[i].next = &list->data[i + 1]; // creation of one linked free_nodes list
+        list->data[i].next_idx = list->data[i + 1].idx;
     }
     return true;
 
@@ -68,10 +71,6 @@ bool resize_up(DL_list_t *list) {
     assert(list != NULL);
 
     return false;
-    // for (size_t i = 0; i < list->size; i++) {
-    //     printf("[71] : '%p'\n", list->data[i].next);
-    //     fill_neighboring_idx(&list->data[i]);
-    // }
 
     // size_t old_size = list->size;
     // list->size *= resize_up_coeff;
@@ -81,24 +80,46 @@ bool resize_up(DL_list_t *list) {
     //     DEBUG_DL_LIST_ERROR(DL_ERR_REALLOC, "")
     //     return false;
     // }
+
+    // // for (size_t i = 0; i < old_size; i++) {
+    // //     printf("idx : [%d], ptr : [%p]\n", list->data[i].idx, &list->data[i]);
+    // //     printf("prev_idx : [%d], next_idx : [%d]\n", list->data[i].prev_idx, list->data[i].next_idx);
+    // //     printf("prev_ptr : [%p], next_ptr : [%p]\n\n", list->data[i].prev, list->data[i].next);
+    // // }
+
     // list->free_node = &list->data[old_size - 1];
 
     // for (size_t i = 0; i < old_size; i++) {
-    //     list->data[i].prev = &list->data[list->data[i].prev_idx];
-    //     list->data[i].next = &list->data[list->data[i].next_idx];
-
+    //     if (list->data[i].prev_idx != -1) {
+    //         list->data[i].prev = &list->data[list->data[i].prev_idx];
+    //     }
+    //     if (list->data[i].next_idx != -1) {
+    //         list->data[i].next = &list->data[list->data[i].next_idx];
+    //     }
     // }
 
-    // // for (size_t i = old_capacity; i < list->size; i++) {
-    // //     list->data[i].empty = true;
-    // //     list->data[i].next = NULL;
-    // //     list->data[i].prev = NULL;
-    // //     list->data[i].value = DL_LIST_POISON_VALUE;
-    // // }
+    // list->data[old_size - 1].next = &list->data[old_size];
+    // list->data[old_size - 1].next_idx = (int) old_size;
 
-    // // for (size_t i = old_capacity; i < list->size - 1; i++) {
-    // //     list->data[i].next = &list->data[i + 1]; // creation of one linked free_nodes list
-    // // }
+    // for (size_t i = old_size; i < list->size; i++) {
+    //     list->data[i].empty = true;
+    //     list->data[i].next = NULL;
+    //     list->data[i].prev = NULL;
+
+    //     list->data[i].idx = (int) i;
+    //     list->data[i].next_idx = -1;
+    //     list->data[i].prev_idx = -1;
+    //     fill_neighboring_idx(&list->data[i]);
+
+    //     list->data[i].value = DL_LIST_POISON_VALUE;
+    // }
+
+    // for (size_t i = old_size; i < list->size - 1; i++) {
+    //     list->data[i].next = &list->data[i + 1]; // creation of one linked free_nodes list
+    //     list->data[i].next_idx = list->data[i + 1].idx;
+    // }
+
+
     // return true;
 }
 
@@ -220,7 +241,7 @@ DL_list_node_t *DL_list_push_front(DL_list_t *list, const DL_list_elem_value_t v
     return new_node;
 }
 
-DL_list_node_t *DL_list_insert_back(DL_list_t *list, DL_list_node_t *ptr, const DL_list_elem_value_t value) { // FIXME: вместо addr исп. указатели
+DL_list_node_t *DL_list_insert_back(DL_list_t *list, DL_list_node_t *ptr, const DL_list_elem_value_t value) {
     assert(list != NULL);
 
     DL_list_node_t *new_node = DL_list_get_free_cell_addr(list);
@@ -355,8 +376,6 @@ DL_list_node_t *DL_list_find(DL_list_t *list, const DL_list_elem_value_t value) 
     }
     return NULL;
 }
-
-// TODO: сделать realloc списка вверх
 
 void DL_list_clear(DL_list_t *list) {
     assert(list != NULL);

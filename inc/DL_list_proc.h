@@ -23,15 +23,11 @@ const char LOG_GRAPHVIZ_CODE_DIR_NAME[] = "graphviz_code_dir";
 
 
 const size_t MAX_FMT_SZ = 32;
-
 const size_t MAX_LOG_DIR_SZ = 128;
-
 const size_t MAX_IMG_DIR_SZ = MAX_LOG_DIR_SZ + MAX_FMT_SZ;
-
 const size_t MAX_DIGITS_N = 32;
 const size_t MAX_GRAPHVIZ_CODES_DIR_SZ = MAX_LOG_DIR_SZ + sizeof(LOG_GRAPHVIZ_CODE_DIR_NAME);
 const size_t MAX_LOG_FILE_PATH_SZ = MAX_GRAPHVIZ_CODES_DIR_SZ + MAX_FMT_SZ;
-
 const size_t MAX_SYSTEM_COMMAND_SIZE = MAX_GRAPHVIZ_CODES_DIR_SZ + MAX_IMG_DIR_SZ + MAX_FMT_SZ + 2 *  MAX_LOG_FILE_PATH_SZ;
 
 const int resize_up_coeff = 2;

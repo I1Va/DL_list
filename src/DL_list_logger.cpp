@@ -145,17 +145,14 @@ graphviz_dir_t DL_list_make_graphviz_dirs(char log_file_path[]) {
         DEBUG_DL_LIST_ERROR(DL_ERR_SYSTEM, "execution: '%s' failed", mkdir_graphviz_code_command);
     }
 
-
-    // printf("count: %d\n", get_dir_files_count(logs_dir_obj.img_dir));
-    // printf("%s\n", logs_dir_obj.log_dir);
-    // printf("%s\n", logs_dir_obj.img_dir);
-    // printf("%s\n", logs_dir_obj.graphviz_codes_dir);
     return logs_dir_obj;
 }
 
 void graphviz_start_graph(FILE *graphviz_code_file) {
     fprintf(graphviz_code_file, "digraph G{\n");
-    fprintf(graphviz_code_file, "   rankdir=LR;\n");
+    fprintf(graphviz_code_file, "    rankdir=LR;\n");
+    // fprintf(graphviz_code_file, "    splines=true;\n");
+    // fprintf(graphviz_code_file, "    overlap=true;\n");
 }
 
 void graphviz_end_graph(FILE *graphviz_code_file) {
@@ -164,18 +161,18 @@ void graphviz_end_graph(FILE *graphviz_code_file) {
 }
 
 void graphviz_make_node(FILE *graphviz_code_file, DL_list_node_t *node) {
-    fprintf(graphviz_code_file, "   NODE%p[pin=true,shape=\"box\",label=\"addr: %p\nval: %d\nprev: %p\nnext: %p\"];\n", node, node, node->value, node->prev, node->next);
+    fprintf(graphviz_code_file, "    NODE%p[pin=true,shape=\"box\",label=\"addr: %p\nval: %d\nprev: %p\nnext: %p\"];\n", node, node, node->value, node->prev, node->next);
 }
 
 void graphviz_make_tiny_node(FILE *graphviz_code_file, DL_list_node_t *node) {
-    fprintf(graphviz_code_file, "   NODE%p[pin=true,shape=\"box\",label=\"val: %d\"];\n", node, node->value);
+    fprintf(graphviz_code_file, "    NODE%p[pin=true,shape=\"box\",label=\"val: %d\"];\n", node, node->value);
 }
 
 void graphviz_make_heavy_unvisible_edge(FILE *graphviz_code_file, DL_list_node_t *node1, DL_list_node_t *node2) {
-    fprintf(graphviz_code_file, "   NODE%p -> NODE%p [weight=%d,color=\"white\"];\n", node1, node2, EDGE_MAX_WEIGHT);
+    fprintf(graphviz_code_file, "    NODE%p -> NODE%p [weight=%d,color=\"white\"];\n", node1, node2, EDGE_MAX_WEIGHT);
 }
 void graphviz_make_edge(FILE *graphviz_code_file, DL_list_node_t *node1, DL_list_node_t *node2, const char color[] = "black", int penwidth=SIMP_EDGE_WIDTH) {
-    fprintf(graphviz_code_file, "   NODE%p -> NODE%p [color=\"%s\",penwidth=%d];\n", node1, node2, color, penwidth);
+    fprintf(graphviz_code_file, "    NODE%p -> NODE%p [color=\"%s\",penwidth=%d];\n", node1, node2, color, penwidth);
 }
 
 void DL_list_log_html_insert_image(FILE *log_output_file_ptr, char short_img_path[], int width_percent) {
@@ -184,12 +181,20 @@ void DL_list_log_html_insert_image(FILE *log_output_file_ptr, char short_img_pat
     fprintf(log_output_file_ptr, "<img src=\"%s\" width=\"%d%%\">\n", short_img_path, width_percent);
 }
 
+void graphviz_make_list_same_rank(FILE *graphviz_code_file, DL_list_t *list) {
+    fprintf(graphviz_code_file, "    {rank = same; ");
+    for (size_t i = 0; i < list->size; i++) {
+        fprintf(graphviz_code_file, "NODE%p; ", &list->data[i]);
+    }
+    fprintf(graphviz_code_file, "};\n");
+}
+
 bool DL_list_generate_graph_img(DL_list_t *list, log_t *log_obj, char short_img_path[]) {
     graphviz_dir_t log_dir_obj = DL_list_make_graphviz_dirs(log_obj->log_file);
 
     int graph_num = get_dir_files_count(log_dir_obj.graphviz_codes_dir);
 
-    char graphviz_code_file_name[MAX_LOG_FILE_PATH_SZ] = {}; //FIXME:  WINDOWS: MAX_PATH;
+    char graphviz_code_file_name[MAX_LOG_FILE_PATH_SZ] = {};
 
     snprintf(graphviz_code_file_name, MAX_LOG_FILE_PATH_SZ, "%s/%d.dot", log_dir_obj.graphviz_codes_dir, graph_num);
     // printf("gr file: %s\n", graphviz_code_file_name);
@@ -205,28 +210,21 @@ bool DL_list_generate_graph_img(DL_list_t *list, log_t *log_obj, char short_img_
     // MAKING GRAPH
 
     graphviz_start_graph(graphviz_code_file);
+
+
     for (size_t i = 0; i < list->size; i++) {
         if (log_obj->short_log) {
             graphviz_make_tiny_node(graphviz_code_file, &list->data[i]);
         } else {
             graphviz_make_node(graphviz_code_file, &list->data[i]);
         }
-
     }
+    // graphviz_make_list_same_rank(graphviz_code_file, list);
     for (size_t i = 1; i < list->size; i++) {
         graphviz_make_heavy_unvisible_edge(graphviz_code_file, &list->data[i - 1], &list->data[i]);
     }
 
-    // list->data[0].next = 0;
-    // list->data[0].next = 0;
-    // list->data[2].prev = 4;
-    // list->data[3].next = 3;
-    // list->data[1].prev = 5; // EXAMPLE
-    // list->data[4].next = 1;
-    // list->data[3].next = 2;
-    // list->data[8].next = 6;
-    // list->data[7].prev = 4;
-    // list->data[5].next = 7;
+
 
     for (size_t i = 0; i < list->size; i++) {
         if (list->data[i].next != NULL) {
