@@ -179,8 +179,8 @@ void graphviz_make_node(FILE *graphviz_code_file, DL_list_node_t *node) {
     fprintf(graphviz_code_file, "    NODE%p[pin=true,shape=\"box\",label=\"addr: %p\nval: %d\nprev: %p\nnext: %p\"];\n", node, node, node->value, node->prev, node->next);
 }
 
-void graphviz_color_node(FILE *graphviz_code_file, DL_list_node_t *node, const char color[]) {
-    fprintf(graphviz_code_file, "    NODE%p[color=\"%s\"];\n", node, color);
+void graphviz_fillcolor_node(FILE *graphviz_code_file, DL_list_node_t *node, const char color[]) {
+    fprintf(graphviz_code_file, "    NODE%p[style=\"filled\",fillcolor=\"%s\"];\n", node, color);
 }
 
 void graphviz_make_tiny_node(FILE *graphviz_code_file, DL_list_node_t *node) {
@@ -218,10 +218,10 @@ bool DL_list_generate_graph_dot(DL_list_t *list, log_t *log_obj) {
             graphviz_make_node(log_obj->graph_log.graphviz_code_file, &list->data[i]);
         }
         if (list->data[i].empty) {
-            graphviz_color_node(log_obj->graph_log.graphviz_code_file, &list->data[i], EMPTY_NODE_COLOR);
+            graphviz_fillcolor_node(log_obj->graph_log.graphviz_code_file, &list->data[i], EMPTY_NODE_COLOR);
         }
         if (i == 0) {
-            graphviz_color_node(log_obj->graph_log.graphviz_code_file, &list->data[i], FICTIVE_NODE_COLOR);
+            graphviz_fillcolor_node(log_obj->graph_log.graphviz_code_file, &list->data[i], FICTIVE_NODE_COLOR);
         }
     }
     // graphviz_make_list_same_rank(graphviz_code_file, list);

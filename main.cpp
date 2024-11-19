@@ -40,7 +40,7 @@ int main() {
 
     graphviz_start_graph(log_obj.graph_log.graphviz_code_file);
     DL_list_generate_graph_dot(&list, &log_obj);
-    graphviz_color_node(log_obj.graph_log.graphviz_code_file, &list.data[4], "red");
+    graphviz_fillcolor_node(log_obj.graph_log.graphviz_code_file, &list.data[4], "red");
     graphviz_end_graph(log_obj.graph_log.graphviz_code_file);
 
     // DL_list_insert(&list, 4, 52, &last_err);
