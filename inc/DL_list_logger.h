@@ -10,6 +10,9 @@
 #include "DL_list_proc.h"
 
 
+const char EMPTY_NODE_COLOR[] = "blue";
+const char FICTIVE_NODE_COLOR[] = "purple";
+
 const int EDGE_MAX_WEIGHT = 1024;
 const int SIMP_EDGE_WIDTH = 2;
 
@@ -21,7 +24,6 @@ enum DL_list_log_type_t {
     DL_LOG_DEBUG = 1,
     DL_LOG_ERROR = 2,
 };
-
 
 struct graphviz_dir_t {
     char log_dir[MAX_LOG_DIR_SZ];
@@ -72,7 +74,7 @@ void graphviz_make_heavy_unvisible_edge(FILE *graphviz_code_file, DL_list_node_t
 void graphviz_make_edge(FILE *graphviz_code_file, DL_list_node_t *node1, DL_list_node_t *node2, const char color[], int penwidth);
 void DL_list_log_html_insert_image(FILE *log_output_file_ptr, char short_img_path[], int width_percent);
 bool DL_list_generate_graph_dot(DL_list_t *list, log_t *log_obj);
-void graphviz_color_node(FILE *graphviz_code_file, DL_list_node_t *node, char color[]);
+void graphviz_color_node(FILE *graphviz_code_file, DL_list_node_t *node, const char color[]);
 
 #define ListLogVar(log_output_file_ptr, log_type, fmt, ...) log_var_print(log_output_file_ptr, log_type, __FILE_NAME__, __PRETTY_FUNCTION__, __LINE__, fmt, ##__VA_ARGS__);
 

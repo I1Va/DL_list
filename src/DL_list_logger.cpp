@@ -12,6 +12,7 @@
 #include "DL_list_proc.h"
 #include "general.h"
 
+
 bool logs_ctor(log_t *log_obj, const char log_dir[], const char log_file[]) {
     *log_obj = {};
     memcpy(log_obj->log_file, log_file, MAX_LOG_FILE_PATH_SZ);
@@ -178,7 +179,7 @@ void graphviz_make_node(FILE *graphviz_code_file, DL_list_node_t *node) {
     fprintf(graphviz_code_file, "    NODE%p[pin=true,shape=\"box\",label=\"addr: %p\nval: %d\nprev: %p\nnext: %p\"];\n", node, node, node->value, node->prev, node->next);
 }
 
-void graphviz_color_node(FILE *graphviz_code_file, DL_list_node_t *node, char color[]) {
+void graphviz_color_node(FILE *graphviz_code_file, DL_list_node_t *node, const char color[]) {
     fprintf(graphviz_code_file, "    NODE%p[color=\"%s\"];\n", node, color);
 }
 
@@ -215,6 +216,12 @@ bool DL_list_generate_graph_dot(DL_list_t *list, log_t *log_obj) {
             graphviz_make_tiny_node(log_obj->graph_log.graphviz_code_file, &list->data[i]);
         } else {
             graphviz_make_node(log_obj->graph_log.graphviz_code_file, &list->data[i]);
+        }
+        if (list->data[i].empty) {
+            graphviz_color_node(log_obj->graph_log.graphviz_code_file, &list->data[i], EMPTY_NODE_COLOR);
+        }
+        if (i == 0) {
+            graphviz_color_node(log_obj->graph_log.graphviz_code_file, &list->data[i], FICTIVE_NODE_COLOR);
         }
     }
     // graphviz_make_list_same_rank(graphviz_code_file, list);
