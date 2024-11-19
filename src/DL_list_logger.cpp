@@ -27,6 +27,22 @@ bool logs_ctor(log_t *log_obj, const char log_dir[], const char log_file[]) {
 
     fprintf(log_file_ptr, "<pre>\n");
 
+    // GRAPH LOG
+    log_obj->graph_log = DL_list_make_graphviz_dirs(log_obj->log_file);
+    log_obj->graph_log.graph_num = get_dir_files_count(log_obj->graph_log.graphviz_codes_dir);
+
+    snprintf(log_obj->graph_log.graphviz_code_file_name, MAX_LOG_FILE_PATH_SZ, "%s/%d.dot", log_obj->graph_log.graphviz_codes_dir, log_obj->graph_log.graph_num);
+    snprintf(log_obj->graph_log.img_file_name, MAX_LOG_FILE_PATH_SZ, "%s/%d.png", log_obj->graph_log.img_dir, log_obj->graph_log.graph_num);
+    snprintf(log_obj->graph_log.short_img_path, MAX_LOG_FILE_PATH_SZ, "%s/%d.png", LOG_IMG_DIR_NAME, log_obj->graph_log.graph_num);
+    snprintf(log_obj->graph_log.short_img_path, MAX_LOG_FILE_PATH_SZ, "%s/%d.png", LOG_IMG_DIR_NAME, log_obj->graph_log.graph_num);
+
+    FILE* graphviz_code_file = fopen(log_obj->graph_log.graphviz_code_file_name, "w");
+    if (graphviz_code_file == NULL) {
+        return false;
+    }
+
+    log_obj->graph_log.graphviz_code_file = graphviz_code_file;
+
     return true;
 }
 
@@ -128,8 +144,6 @@ graphviz_dir_t DL_list_make_graphviz_dirs(char log_file_path[]) {
     memcpy(logs_dir_obj.log_dir, log_file_path, (size_t) (log_dir_ptr - log_file_path) * sizeof(char));
 
 
-
-
     snprintf(logs_dir_obj.img_dir, MAX_IMG_DIR_SZ, "%s/%s", logs_dir_obj.log_dir, LOG_IMG_DIR_NAME);
     snprintf(logs_dir_obj.graphviz_codes_dir, MAX_GRAPHVIZ_CODES_DIR_SZ, "%s/%s", logs_dir_obj.log_dir, LOG_GRAPHVIZ_CODE_DIR_NAME);
 
@@ -164,6 +178,10 @@ void graphviz_make_node(FILE *graphviz_code_file, DL_list_node_t *node) {
     fprintf(graphviz_code_file, "    NODE%p[pin=true,shape=\"box\",label=\"addr: %p\nval: %d\nprev: %p\nnext: %p\"];\n", node, node, node->value, node->prev, node->next);
 }
 
+void graphviz_color_node(FILE *graphviz_code_file, DL_list_node_t *node, char color[]) {
+    fprintf(graphviz_code_file, "    NODE%p[color=\"%s\"];\n", node, color);
+}
+
 void graphviz_make_tiny_node(FILE *graphviz_code_file, DL_list_node_t *node) {
     fprintf(graphviz_code_file, "    NODE%p[pin=true,shape=\"box\",label=\"val: %d\"];\n", node, node->value);
 }
@@ -189,61 +207,28 @@ void graphviz_make_list_same_rank(FILE *graphviz_code_file, DL_list_t *list) {
     fprintf(graphviz_code_file, "};\n");
 }
 
-bool DL_list_generate_graph_img(DL_list_t *list, log_t *log_obj, char short_img_path[]) {
-    graphviz_dir_t log_dir_obj = DL_list_make_graphviz_dirs(log_obj->log_file);
-
-    int graph_num = get_dir_files_count(log_dir_obj.graphviz_codes_dir);
-
-    char graphviz_code_file_name[MAX_LOG_FILE_PATH_SZ] = {};
-
-    snprintf(graphviz_code_file_name, MAX_LOG_FILE_PATH_SZ, "%s/%d.dot", log_dir_obj.graphviz_codes_dir, graph_num);
-    // printf("gr file: %s\n", graphviz_code_file_name);
-    char img_file_name[MAX_LOG_FILE_PATH_SZ] = {};
-    snprintf(img_file_name, MAX_LOG_FILE_PATH_SZ, "%s/%d.png", log_dir_obj.img_dir, graph_num);
-    snprintf(short_img_path, MAX_LOG_FILE_PATH_SZ, "%s/%d.png", LOG_IMG_DIR_NAME, graph_num);
-    // printf("img file: %s\n", graphviz_code_file_name);
-
-    FILE* graphviz_code_file = fopen(graphviz_code_file_name, "w");
-    if (graphviz_code_file == NULL) {
-        return false;
-    }
-    // MAKING GRAPH
-
-    graphviz_start_graph(graphviz_code_file);
-
-
+bool DL_list_generate_graph_dot(DL_list_t *list, log_t *log_obj) {
+    assert(list != NULL);
+    assert(log_obj != NULL);
     for (size_t i = 0; i < list->size; i++) {
         if (log_obj->short_log) {
-            graphviz_make_tiny_node(graphviz_code_file, &list->data[i]);
+            graphviz_make_tiny_node(log_obj->graph_log.graphviz_code_file, &list->data[i]);
         } else {
-            graphviz_make_node(graphviz_code_file, &list->data[i]);
+            graphviz_make_node(log_obj->graph_log.graphviz_code_file, &list->data[i]);
         }
     }
     // graphviz_make_list_same_rank(graphviz_code_file, list);
     for (size_t i = 1; i < list->size; i++) {
-        graphviz_make_heavy_unvisible_edge(graphviz_code_file, &list->data[i - 1], &list->data[i]);
+        graphviz_make_heavy_unvisible_edge(log_obj->graph_log.graphviz_code_file, &list->data[i - 1], &list->data[i]);
     }
-
-
 
     for (size_t i = 0; i < list->size; i++) {
         if (list->data[i].next != NULL) {
-            graphviz_make_edge(graphviz_code_file, &list->data[i], list->data[i].next, "green", 2);
+            graphviz_make_edge(log_obj->graph_log.graphviz_code_file, &list->data[i], list->data[i].next, "green", 2);
         }
         if (list->data[i].prev != NULL) {
-            graphviz_make_edge(graphviz_code_file, list->data[i].prev, &list->data[i], "blue", 1);
+            graphviz_make_edge(log_obj->graph_log.graphviz_code_file, list->data[i].prev, &list->data[i], "blue", 1);
         }
-    }
-
-    graphviz_end_graph(graphviz_code_file);
-    // MAKING GRAPH
-
-    char draw_graph_command[MAX_SYSTEM_COMMAND_SIZE] = {};
-    snprintf(draw_graph_command, MAX_SYSTEM_COMMAND_SIZE, "dot %s -Tpng -o %s",
-        graphviz_code_file_name, img_file_name);
-    if (system(draw_graph_command) != 0) {
-        DEBUG_DL_LIST_ERROR(DL_ERR_SYSTEM, "execution: '%s' failed", draw_graph_command);
-        return false;
     }
     return true;
 }
@@ -276,9 +261,16 @@ void DL_list_log_dump(DL_list_t *list, log_t *log_obj, const char file_name[], c
     fprintf_html_grn(log_obj->log_file_ptr, "size: [%lu]\n", list->size);
     fprintf_html_grn(log_obj->log_file_ptr, "free_addr: [%p]\n", list->free_node);
 
-    char short_img_path[MAX_LOG_FILE_PATH_SZ] = {};
-    DL_list_generate_graph_img(list, log_obj, short_img_path);
-    DL_list_log_html_insert_image(log_obj->log_file_ptr, short_img_path, LOG_WIDTH_VAL);
+    char draw_graph_command[MAX_SYSTEM_COMMAND_SIZE] = {};
+    snprintf(draw_graph_command, MAX_SYSTEM_COMMAND_SIZE, "dot %s -Tpng -o %s",
+        log_obj->graph_log.graphviz_code_file_name, log_obj->graph_log.img_file_name);
+    if (system(draw_graph_command) != 0) {
+        DEBUG_DL_LIST_ERROR(DL_ERR_SYSTEM, "execution: '%s' failed", draw_graph_command);
+        return;
+    }
+
+
+    DL_list_log_html_insert_image(log_obj->log_file_ptr, log_obj->graph_log.short_img_path, LOG_WIDTH_VAL);
     // for (int i = 0; i < list.size; i++) {
     //     fprintf(list.log_output_file_ptr, list.data)
     // }

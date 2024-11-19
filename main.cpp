@@ -14,7 +14,7 @@ int main() {
         debug("logs_ctor failed");
         return EXIT_FAILURE;
     }
-    log_obj.short_log = true;
+    log_obj.short_log = false;
 
     // DL_list_err_t last_err = DL_ERR_OK;
 
@@ -26,12 +26,11 @@ int main() {
         DL_list_push_back(&list, val);
     }
 
-    DL_list_pop(&list, &list.data[4]);
+
     DL_list_insert_back(&list, &list.data[3], 2006);
-
-
-
     DL_list_insert_back(&list, &list.data[2], 7500);
+
+    DL_list_pop(&list, &list.data[4]);
 
     // DL_list_insert_front(&list, &list.data[4], 7500);
 
@@ -39,8 +38,13 @@ int main() {
     // DEBUG_DL_LIST_ERROR(DL_list_verify(&list), "")
 
 
+    graphviz_start_graph(log_obj.graph_log.graphviz_code_file);
+    DL_list_generate_graph_dot(&list, &log_obj);
+    graphviz_color_node(log_obj.graph_log.graphviz_code_file, &list.data[4], "red");
+    graphviz_end_graph(log_obj.graph_log.graphviz_code_file);
 
     // DL_list_insert(&list, 4, 52, &last_err);
+    // log_obj.log_file_ptr;
     ListLogDump(&list, &log_obj);
     DL_list_dtor(&list);
 

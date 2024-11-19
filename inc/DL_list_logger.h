@@ -14,7 +14,7 @@ const int EDGE_MAX_WEIGHT = 1024;
 const int SIMP_EDGE_WIDTH = 2;
 
 const size_t BORDER_SZ = 100;
-const size_t LOG_WIDTH_VAL = 80;
+const size_t LOG_WIDTH_VAL = 100;
 
 enum DL_list_log_type_t {
     DL_LOG_ANALYS = 0,
@@ -22,18 +22,34 @@ enum DL_list_log_type_t {
     DL_LOG_ERROR = 2,
 };
 
-struct log_t {
-    char log_dir[MAX_LOG_DIR_SZ];
-    char log_file[MAX_LOG_FILE_PATH_SZ];
-    bool short_log;
-    FILE *log_file_ptr;
-};
 
 struct graphviz_dir_t {
     char log_dir[MAX_LOG_DIR_SZ];
     char img_dir[MAX_IMG_DIR_SZ];
     char graphviz_codes_dir[MAX_GRAPHVIZ_CODES_DIR_SZ];
+    char short_img_path[MAX_LOG_FILE_PATH_SZ];
+
+    char graphviz_code_file_name[MAX_LOG_FILE_PATH_SZ];
+    int graph_num;
+
+    char img_file_name[MAX_LOG_FILE_PATH_SZ] = {};
+
+    FILE* graphviz_code_file;
+
 };
+
+struct log_t {
+    char log_dir[MAX_LOG_DIR_SZ];
+    char log_file[MAX_LOG_FILE_PATH_SZ];
+
+
+    bool short_log;
+
+    FILE *log_file_ptr;
+
+    graphviz_dir_t graph_log;
+};
+
 
 void graphviz_make_list_same_rank(FILE *graphviz_code_file, DL_list_t *list);
 bool create_logs_dir(const char log_dir[]);
@@ -55,7 +71,8 @@ void graphviz_make_node(FILE *graphviz_code_file, DL_list_node_t *node);
 void graphviz_make_heavy_unvisible_edge(FILE *graphviz_code_file, DL_list_node_t *node1, DL_list_node_t *node2);
 void graphviz_make_edge(FILE *graphviz_code_file, DL_list_node_t *node1, DL_list_node_t *node2, const char color[], int penwidth);
 void DL_list_log_html_insert_image(FILE *log_output_file_ptr, char short_img_path[], int width_percent);
-bool DL_list_generate_graph_img(DL_list_t *list, log_t *log_obj, char short_img_path[]);
+bool DL_list_generate_graph_dot(DL_list_t *list, log_t *log_obj);
+void graphviz_color_node(FILE *graphviz_code_file, DL_list_node_t *node, char color[]);
 
 #define ListLogVar(log_output_file_ptr, log_type, fmt, ...) log_var_print(log_output_file_ptr, log_type, __FILE_NAME__, __PRETTY_FUNCTION__, __LINE__, fmt, ##__VA_ARGS__);
 
