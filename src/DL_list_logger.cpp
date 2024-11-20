@@ -176,7 +176,8 @@ void graphviz_end_graph(FILE *graphviz_code_file) {
 }
 
 void graphviz_make_node(FILE *graphviz_code_file, DL_list_node_t *node) {
-    fprintf(graphviz_code_file, "    NODE%p[pin=true,shape=\"box\",label=\"addr: %p\nval: %d\nprev: %p\nnext: %p\"];\n", node, node, node->value, node->prev, node->next);
+    fprintf(graphviz_code_file, "    NODE%p[fillcolor=\"%s\",style=\"filled\",pin=true,shape=\"box\","
+        "label=\"addr: %p\nval: %d\nprev: %p\nnext: %p\"];\n", node, EXIST_NODE_COLOR, node, node->value, node->prev, node->next);
 }
 
 void graphviz_fillcolor_node(FILE *graphviz_code_file, DL_list_node_t *node, const char color[]) {
@@ -230,8 +231,13 @@ bool DL_list_generate_graph_dot(DL_list_t *list, log_t *log_obj) {
     }
 
     for (size_t i = 0; i < list->size; i++) {
-        if (list->data[i].next != NULL) {
+        if (list->data[i].empty && list->data[i].next != NULL) {
+            printf("%lu\n", i);
             graphviz_make_edge(log_obj->graph_log.graphviz_code_file, &list->data[i], list->data[i].next, "green", 2);
+            continue;
+        }
+        if (list->data[i].next != NULL) {
+            graphviz_make_edge(log_obj->graph_log.graphviz_code_file, &list->data[i], list->data[i].next, "red", 2);
         }
         if (list->data[i].prev != NULL) {
             graphviz_make_edge(log_obj->graph_log.graphviz_code_file, list->data[i].prev, &list->data[i], "blue", 1);

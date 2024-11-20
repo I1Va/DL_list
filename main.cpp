@@ -7,6 +7,10 @@
 const char LOGS_DIR[] = "./logs";
 const char LOG_FILE[] = "./logs/logfile.html";
 
+void fprintf_node(FILE *stream, DL_list_node_t *node) {
+    fprintf(stream, "ptr: [%p], e%d, val{%d}\n", node, node->empty, node->value);
+}
+
 int main() {
 
     log_t log_obj = {};
@@ -32,15 +36,19 @@ int main() {
 
     DL_list_pop(&list, &list.data[4]);
 
+    for (size_t i = 0; i < list.size; i++) {
+        printf("[%2lu]: ", i);
+        fprintf_node(stdout, &list.data[i]);
+    }
+
     // DL_list_insert_front(&list, &list.data[4], 7500);
 
     // DL_list_insert_back(&list, &list.data[6], 228);
     // DEBUG_DL_LIST_ERROR(DL_list_verify(&list), "")
 
-
     graphviz_start_graph(log_obj.graph_log.graphviz_code_file);
     DL_list_generate_graph_dot(&list, &log_obj);
-    graphviz_fillcolor_node(log_obj.graph_log.graphviz_code_file, &list.data[4], "red");
+    graphviz_fillcolor_node(log_obj.graph_log.graphviz_code_file, &list.data[4], "#FFE0E0");
     graphviz_end_graph(log_obj.graph_log.graphviz_code_file);
 
     // DL_list_insert(&list, 4, 52, &last_err);

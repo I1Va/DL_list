@@ -10,8 +10,9 @@
 #include "DL_list_proc.h"
 
 
-const char EMPTY_NODE_COLOR[] = "darkseagreen";
-const char FICTIVE_NODE_COLOR[] = "coral1";
+const char EMPTY_NODE_COLOR[] = "#D0FFD0"; // "darkseagreen";
+const char FICTIVE_NODE_COLOR[] = "#FFFFD0";
+const char EXIST_NODE_COLOR[] = "#E0FFFF";
 
 const int EDGE_MAX_WEIGHT = 1024;
 const int SIMP_EDGE_WIDTH = 2;
