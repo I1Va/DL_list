@@ -76,6 +76,7 @@ void graphviz_make_edge(FILE *graphviz_code_file, DL_list_node_t *node1, DL_list
 void DL_list_log_html_insert_image(FILE *log_output_file_ptr, char short_img_path[], int width_percent);
 bool DL_list_generate_graph_dot(DL_list_t *list, log_t *log_obj);
 void graphviz_fillcolor_node(FILE *graphviz_code_file, DL_list_node_t *node, const char color[]);
+void fprintf_node(FILE *stream, DL_list_node_t *node);
 
 #define ListLogVar(log_output_file_ptr, log_type, fmt, ...) log_var_print(log_output_file_ptr, log_type, __FILE_NAME__, __PRETTY_FUNCTION__, __LINE__, fmt, ##__VA_ARGS__);
 

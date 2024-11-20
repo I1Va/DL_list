@@ -12,7 +12,6 @@
 #include "DL_list_proc.h"
 #include "general.h"
 
-
 bool logs_ctor(log_t *log_obj, const char log_dir[], const char log_file[]) {
     *log_obj = {};
     memcpy(log_obj->log_file, log_file, MAX_LOG_FILE_PATH_SZ);
@@ -45,6 +44,10 @@ bool logs_ctor(log_t *log_obj, const char log_dir[], const char log_file[]) {
     log_obj->graph_log.graphviz_code_file = graphviz_code_file;
 
     return true;
+}
+
+void fprintf_node(FILE *stream, DL_list_node_t *node) {
+    fprintf(stream, "ptr: [%p], e%d, val{%d}\n", node, node->empty, node->value);
 }
 
 void DL_list_fprintf_border(FILE* stream, const char bord_char, const size_t bord_sz, bool new_line) {

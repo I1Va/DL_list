@@ -10,10 +10,6 @@ struct DL_list_node_t {
     DL_list_node_t *next;
     DL_list_node_t *prev;
 
-    int prev_idx;
-    int next_idx;
-    int idx;
-
     DL_list_elem_value_t value;
     bool empty;
 };
@@ -42,7 +38,6 @@ const DL_list_elem_value_t DL_LIST_POISON_VALUE = 0xBADBAD;
 
 DL_list_elem_value_t *DL_list_front(DL_list_t *list);
 DL_list_elem_value_t *DL_list_back(DL_list_t *list);
-void fill_neighboring_idx(DL_list_node_t *node);
 DL_list_elem_value_t *DL_list_next_elem(DL_list_t *list, const int addr);
 DL_list_elem_value_t *DL_list_prev_elem(DL_list_t *list, const int addr);
 DL_list_node_t *DL_list_push_back(DL_list_t *list, const DL_list_elem_value_t value);
